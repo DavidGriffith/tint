@@ -1,0 +1,68 @@
+
+ROTATION
+--------
+STEP 1:
+Drop the rotate() functions and make a datastructure which holds all the
+shapes (and their rotated versions).
+
+typedef struct
+{
+  int x,y;
+} block_t;
+
+typedef struct
+{
+  int color;
+  int next;
+  block_t block[NUMSHAPES];
+} shape_t;
+
+We then just hold the current blocknumber, when we rotate it, we replace it
+with it's the next field, and so on.
+
+STEP 2:
+Also, make the board a one-dimensional array and get rid of the block_t
+structure. The shape_t structure should look like this then:
+
+typedef struct
+{
+  int next;
+  int block[NUMSHAPES];
+} shape_t;
+
+Just make a array with the initial 7 colors, and keep that color until the
+next piece is chosen. This should prove to be the optimal solution.
+
+SCORE
+-----
+
+Ok, here's what I could figure out and what I think should be used.
+
+1. We count the number of lines that a piece drops when the user press SPACE,
+2. Add 1 to that when we figure out that the block has come to rest,
+3. Multiply above by the current level,
+4. If "Show Next" is enabled, divide by two, else take as is, and add the
+   result to the score.
+
+Of course, we should add 2 instead of 1 to prevent loss of precision in step
+4, and the displayed score is then the score / 2.
+
+TIMING
+------
+
+Here's what I'm going to use:
+
+1. There is 9 levels, numbered from 1 to 9. We allow 1/level of a second to
+   pass before we drop each block one line.
+
+2. After each ten lines that is removed, we increase the level automatically,
+   unless the player is already at the highest level (level 9). CAVEAT: If the
+   user starts at a higher level than one, we pretend he didn't when we come
+   to increasing levels, e.g. if he/she started at level 3, 30 lines must be
+   dropped before we go to level 4.
+
+3. I still have to decide whether to use the BSD type delaying (the type I'm
+   currently using) or to do it the way I first did it (the signal handler
+   method). The question remains which one is the most playable and which
+   one is the most portable.
+

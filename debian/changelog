@@ -1,0 +1,43 @@
+tint (0.03a) unstable; urgency=low
+
+  * Applied patch with some minor tweaks from Marcello Mamino which
+    adds a dotted background.
+  * Applied patches from Robert Lemmen which add support for user logins as
+    default name and an interactive mode for specifying the start level.
+  * Show player statistics.
+
+ -- Abraham van der Merwe <abz@debian.org>  Mon, 16 Jun 2003 23:07:37 +0200
+
+tint (0.02d) unstable; urgency=low
+
+  * Install man page in correct directory (Closes: #128923)
+  * Created a postinst program that checks for old score files
+    before installing the default score file (Closes: #136466)
+  * Added a menu control file (Closes: #128924)
+
+ -- Abraham van der Merwe <abz@debian.org>  Wed, 19 Dec 2001 18:03:34 +0200
+
+tint (0.02c) unstable; urgency=low
+
+  * Removed common-sense suggests from control file *g* (Closes: #123204)
+
+ -- Abraham van der Merwe <abz@debian.org>  Wed, 19 Dec 2001 18:03:34 +0200
+
+tint (0.02b) unstable; urgency=low
+
+  * Changed the name from tclassic to tint (as in TINT Is Not Tetris(tm))
+  * Added a build dependancy on libncurses5-dev (Closes: #124241)
+  * Changed the location for the score file to /var/games (Closes: #124236)
+  * Made score file sgid games (Closes: #123595)
+
+ -- Abraham van der Merwe <abz@debian.org>  Wed, 19 Dec 2001 18:03:34 +0200
+
+tclassic (0.02a) unstable; urgency=low
+
+  * Initial Release. (Closes: #122839)
+
+ -- Abraham van der Merwe <abz@debian.org>  Fri,  7 Dec 2001 17:59:25 +0200
+
+Local variables:
+mode: debian-changelog
+End:

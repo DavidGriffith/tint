@@ -1,0 +1,19 @@
+Source: tint
+Section: games
+Priority: optional
+Maintainer: Abraham van der Merwe <abz@debian.org>
+Build-Depends: debhelper (>> 3.0.0), libncurses5-dev
+Standards-Version: 3.5.2
+
+Package: tint
+Architecture: any
+Depends: ${shlibs:Depends}
+Replaces: tclassic
+Conflicts: tclassic
+Description: TINT Is Not Tetris(tm) ...at least the name isn't
+ As the title suggests, this is a clone of the original tetris game
+ written by Alexey Pajitnov, Dmitry Pavlovsky, and Vadim Gerasimov.
+ .
+ I've tried to keep the game as close to the original as possible, but
+ there is a few differences. Nevertheless, it's probably the closest to
+ the original that you'll ever find in the UNIX world...

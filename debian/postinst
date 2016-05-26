@@ -1,0 +1,13 @@
+#!/bin/sh -e
+
+scorefile="/var/games/tint.scores"
+
+if [ ! -e $scorefile ]
+then
+	touch $scorefile
+	chmod 0664 $scorefile
+	chown root:games $scorefile
+fi
+
+#DEBHELPER#
+
