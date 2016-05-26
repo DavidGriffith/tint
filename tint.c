@@ -652,6 +652,7 @@ int main (int argc,char *argv[])
 				  break;
 				  /* shape moved down one line */
 				case 1:
+				  break;
 			   }
 		  }
 	 }

@@ -27,6 +27,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdlib.h>
+#include <string.h>
+
 #include "typedefs.h"
 #include "utils.h"
 #include "io.h"
@@ -95,6 +98,7 @@ static void fake_rotate (shape_t *shape)
 		real_rotate (shape,FALSE);
 		break;
 	  case 3:	/* This one is not rotated at all */
+		break;
 	 }
 }
 

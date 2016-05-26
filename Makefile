@@ -44,7 +44,7 @@ ifeq ($(CC),colorgcc)
 endif
 endif
 
-CFLAGS = -Wall -O2 -pipe
+CFLAGS = -Wall -Os -pipe
 CPPFLAGS = -DSCOREFILE=\"$(localstatedir)/$(PRG).scores\" #-DUSE_RAND
 LDFLAGS = -s
 LDLIBS = -lncurses

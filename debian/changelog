@@ -1,3 +1,13 @@
+tint (0.03b) unstable; urgency=low
+
+  * Added breaks at end of switch statements to keep gcc 3+ happy
+    (Closes: #316022)
+  * Added missing includes to engine.c
+  * Fixed spelling mistake in NOTES
+  * Updated debian policy version
+
+ -- Abraham van der Merwe <abz@debian.org>  Sun, 17 Jul 2005 13:32:17 +0200
+
 tint (0.03a) unstable; urgency=low
 
   * Applied patch with some minor tweaks from Marcello Mamino which
