@@ -1,4 +1,4 @@
-.TH TINT 6 "December  7, 2001"
+.TH TINT 6 "June 23, 2010"
 .\" Please adjust this date whenever revising the manpage.
 .\"
 .\" Some roff macros, for reference:
@@ -18,6 +18,8 @@ tint \- clone of the original tint
 .RI [ -h ]
 .RI [ -l\  level ]
 .RI [ -n ]
+.RI [ -d ]
+.RI [ -b\  char ]
 .SH DESCRIPTION
 This manual page documents briefly the
 .B tint
@@ -37,6 +39,12 @@ the faster you'll earn points.
 .B \-n
 Draw next shape. When the next shape is drawn, you might find the game to be
 easier, but it will be slower to earn points.
+.TP
+.B \-d
+Draw dotted lines.
+.TP
+.B \-b <char>
+Use the specified character (instead of spaces) to draw blocks.
 .SH AUTHOR
 This manual page was written by Abraham van der Merwe <abz@debian.org>,
 for the Debian GNU/Linux system (but may be used by others).

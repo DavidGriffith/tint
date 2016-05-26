@@ -31,15 +31,13 @@
 #include <sys/time.h>	/* gettimeofday() */
 #include <unistd.h>		/* gettimeofday() */
 
-#include <curses.h>
-
 #include "io.h"
 
 /* Number of colors defined in io.h */
 #define NUM_COLORS	8
 
 /* Number of attributes defined in io.h */
-#define NUM_ATTRS	7
+#define NUM_ATTRS	9
 
 /* Cursor definitions */
 #define CURSOR_INVISIBLE	0
@@ -93,6 +91,8 @@ void io_init ()
    attr_map[ATTR_BLINK] = A_BLINK;
    attr_map[ATTR_REVERSE] = A_REVERSE;
    attr_map[ATTR_INVISIBLE] = A_INVIS;
+
+  keypad(stdscr, TRUE);
 }
 
 /* Restore original screen state */
@@ -136,6 +136,7 @@ void out_putch (char ch)
    addch (ch);
 }
 
+/* Put a unicode character on the screen */
 /* Put a string on the screen */
 void out_printf (char *format, ...)
 {

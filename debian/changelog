@@ -1,3 +1,30 @@
+tint (0.04+nmu1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Create /var/games during installation (Closes: #591590) 
+  * Remove score file on purge (Closes: 328472)
+  * Apply Guido Berhoerster's patch to fix two buffer overflows
+    (Closes: 590208)
+  * Bring Standards-Version up-to-date (3.9.1).
+
+ -- Sebastian Reichel <elektranox@gmail.com>  Sun, 08 Aug 2010 17:54:30 +0200
+
+tint (0.04) unstable; urgency=low
+
+  * This is the "RMLL 2010 preparation" release :-).
+  * Assume maintainership (Closes: Bug#499263).
+  * Add support for arrow and return keys (Closes: Bug#360910, Bug#504198,
+    Bug#575583).
+  * Change menu section from "Games/Tetris-like" to "Games/Blocks".
+  * Use debhelper 7.
+  * Do not unconditionally strip executable (Closes: Bug#438211).
+  * Bring Standards-Version up-to-date (3.8.4).
+  * Add option "-b <char>" for specifying the character to use when drawing
+    blocks.
+  * Mention "-d" in tint.6.
+
+ -- Mario Lang <mlang@debian.org>  Wed, 23 Jun 2010 10:16:32 +0200
+
 tint (0.03b) unstable; urgency=low
 
   * Added breaks at end of switch statements to keep gcc 3+ happy

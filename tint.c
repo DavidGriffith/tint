@@ -72,6 +72,7 @@
 static bool shownext;
 static bool dottedlines;
 static int level = MINLEVEL - 1,shapecount[NUMSHAPES];
+static char blockchar = ' ';
 
 /*
  * Functions
@@ -125,8 +126,8 @@ static void drawboard (board_t board)
 			 /* Block */
 		   default:
 			 out_setcolor (COLOR_BLACK,board[x][y]);
-			 out_putch (' ');
-			 out_putch (' ');
+			 out_putch (blockchar);
+			 out_putch (blockchar);
 		  }
 	 }
    out_setattr (ATTR_OFF);
@@ -365,7 +366,7 @@ static void createscores (int score)
    FILE *handle;
    int i,j;
    score_t scores[NUMSCORES];
-   char header[strlen (SCORE_HEADER)];
+   char header[strlen (SCORE_HEADER)+1];
    if (score == 0) return;	/* No need saving this */
    for (i = 1; i < NUMSCORES; i++)
 	 {
@@ -418,7 +419,7 @@ static void savescores (int score)
    FILE *handle;
    int i,j,ch;
    score_t scores[NUMSCORES];
-   char header[strlen (SCORE_HEADER)];
+   char header[strlen (SCORE_HEADER)+1];
    time_t tmp = 0;
    if ((handle = fopen (scorefile,"r")) == NULL)
 	 {
@@ -497,11 +498,12 @@ static void savescores (int score)
 
 static void showhelp ()
 {
-   fprintf (stderr,"USAGE: tint [-h] [-l level] [-n]\n");
+   fprintf (stderr,"USAGE: tint [-h] [-l level] [-n] [-d] [-b char]\n");
    fprintf (stderr,"  -h           Show this help message\n");
    fprintf (stderr,"  -l <level>   Specify the starting level (%d-%d)\n",MINLEVEL,MAXLEVEL);
    fprintf (stderr,"  -n           Draw next shape\n");
    fprintf (stderr,"  -d           Draw vertical dotted lines\n");
+   fprintf (stderr,"  -b <char>    Use this character to draw blocks instead of spaces\n");
    exit (EXIT_FAILURE);
 }
 
@@ -529,6 +531,12 @@ static void parse_options (int argc,char *argv[])
 		  shownext = TRUE;
 		else if(strcmp(argv[i],"-d")==0)
 		  dottedlines = TRUE;
+		else if(strcmp(argv[i], "-b")==0)
+		  {
+		    i++;
+		    if (i >= argc || strlen(argv[i]) < 1) showhelp();
+		    blockchar = argv[i][0];
+		  }
 		else
 		  {
 			 fprintf (stderr,"Invalid option -- %s\n",argv[i]);
@@ -584,15 +592,19 @@ int main (int argc,char *argv[])
 			 switch (ch)
 			   {
 				case 'j':
+				case KEY_LEFT:
 				  engine_move (&engine,ACTION_LEFT);
 				  break;
 				case 'k':
+				case '\n':
 				  engine_move (&engine,ACTION_ROTATE);
 				  break;
 				case 'l':
+				case KEY_RIGHT:
 				  engine_move (&engine,ACTION_RIGHT);
 				  break;
 				case ' ':
+				case KEY_DOWN:
 				  engine_move (&engine,ACTION_DROP);
 				  break;
 				  /* show next piece */
@@ -605,6 +617,7 @@ int main (int argc,char *argv[])
 				  break;
 				  /* next level */
 				case 'a':
+				case KEY_UP:
 				  if (level < MAXLEVEL)
 					{
 					   level++;

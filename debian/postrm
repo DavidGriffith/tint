@@ -1,0 +1,14 @@
+#!/bin/sh -e
+
+scorefile="/var/games/tint.scores"
+
+if [ "$1" = "purge" ]
+then
+	if [ -e $scorefile ]
+	then
+		rm $scorefile
+	fi
+fi
+
+#DEBHELPER#
+

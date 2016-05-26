@@ -1,4 +1,4 @@
-?package(tint):needs="text" section="Games/Tetris-like" \
+?package(tint):needs="text" section="Games/Blocks" \
 	title="TINT Is Not Tetris(tm)" \
 	command="sh -c '/usr/games/tint -l 5;echo;echo PRESS ENTER;read line'" \
 	hints="Text"
