@@ -83,6 +83,7 @@ static char blockchar = ' ';
 static void score_function (engine_t *engine)
 {
    int score = SCOREVAL (level * (engine->status.dropcount + 1));
+   score += SCOREVAL ((level + 10) * engine->status.currentdroppedlines * engine->status.currentdroppedlines);
 
    if (shownext) score /= 2;
    if (dottedlines) score /= 2;

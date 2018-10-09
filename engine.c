@@ -295,10 +295,12 @@ int engine_evaluate (engine_t *engine)
 {
    if (shape_bottom (engine->board,&engine->shapes[engine->curshape],engine->curx,engine->cury))
 	 {
+		/* update status information */
+		int dropped_lines = droplines(engine->board);
+		engine->status.droppedlines += dropped_lines;
+		engine->status.currentdroppedlines = dropped_lines;
 		/* increase score */
 		engine->score_function (engine);
-		/* update status information */
-		engine->status.droppedlines += droplines (engine->board);
 		engine->curx -= 5;
 		engine->curx = abs (engine->curx);
 		engine->status.rotations = 4 - engine->status.rotations;
