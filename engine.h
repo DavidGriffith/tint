@@ -74,6 +74,7 @@ typedef struct
    int dropcount;
    int efficiency;
    int droppedlines;
+   int currentdroppedlines;
 } status_t;
 
 typedef struct engine_struct
