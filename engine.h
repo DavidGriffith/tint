@@ -82,6 +82,8 @@ typedef struct engine_struct
    int curx,cury;									/* coordinates of current piece */
    int curshape,nextshape;							/* current & next shapes */
    int score;										/* score */
+   int bag_iterator;								/* iterator for randomized bag */
+   int bag[NUMSHAPES];								/* pointer to bag of shapes */
    shapes_t shapes;									/* shapes */
    board_t board;									/* board */
    status_t status;									/* current status of shapes */

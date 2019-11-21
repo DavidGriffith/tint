@@ -236,6 +236,20 @@ static int droplines (board_t board)
    return droppedlines;
 }
 
+/* shuffle int array */
+void shuffle (int *array, size_t n)
+{
+   size_t i;
+   for (i = 0; i < n - 1; i++)
+   {
+      int range = (int)(n - i);
+      size_t j = i + rand_value(range);
+      int t = array[j];
+      array[j] = array[i];
+      array[i] = t;
+   }
+}
+
 /*
  * Initialize specified tetris engine
  */
@@ -246,8 +260,13 @@ void engine_init (engine_t *engine,void (*score_function)(engine_t *))
    /* intialize values */
    engine->curx = 5;
    engine->cury = 1;
-   engine->curshape = rand_value (NUMSHAPES);
-   engine->nextshape = rand_value (NUMSHAPES);
+   engine->bag_iterator = 0;
+   /* create and randomize bag */
+   for (int j = 0; j < NUMSHAPES; j++) engine->bag[j] = j;
+   shuffle (engine->bag,NUMSHAPES);
+   engine->curshape = engine->bag[engine->bag_iterator%NUMSHAPES];
+   engine->nextshape = engine->bag[(engine->bag_iterator+1)%NUMSHAPES];
+   engine->bag_iterator++;
    engine->score = 0;
    engine->status.moves = engine->status.rotations = engine->status.dropcount = engine->status.efficiency = engine->status.droppedlines = 0;
    /* initialize shapes */
@@ -311,8 +330,11 @@ int engine_evaluate (engine_t *engine)
 		/* intialize values */
 		engine->curx = 5;
 		engine->cury = 1;
-		engine->curshape = engine->nextshape;
-		engine->nextshape = rand_value (NUMSHAPES);
+		engine->curshape = engine->bag[engine->bag_iterator%NUMSHAPES];
+		/* shuffle bag before first item in bag would be reused */
+		if ((engine->bag_iterator+1) % NUMSHAPES == 0) shuffle(engine->bag, NUMSHAPES);
+		engine->nextshape = engine->bag[(engine->bag_iterator+1)%NUMSHAPES];
+		engine->bag_iterator++;
 		/* initialize shapes */
 		memcpy (engine->shapes,SHAPES,sizeof (shapes_t));
 		/* return games status */
