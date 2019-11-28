@@ -124,88 +124,136 @@ static bool allowed (board_t board,shape_t *shape,int x,int y)
    return (!occupied);
 }
 
+/* Set y coordinate of shadow */
+static void place_shadow_to_bottom (board_t board,shape_t *shape,int x_shadow,int *y_shadow,int y) {
+   while (allowed(board,shape,x_shadow,y+1)) y++;
+   *y_shadow = y;
+}
+
 /* Move the shape left if possible */
-static bool shape_left (board_t board,shape_t *shape,int *x,int y)
+static bool shape_left (engine_t *engine)
 {
+   board_t *board = &engine->board;
+   shape_t *shape = &engine->shapes[engine->curshape];
    bool result = FALSE;
-   eraseshape (board,shape,*x,y);
-   if (allowed (board,shape,*x - 1,y))
+   eraseshape (*board,shape,engine->curx,engine->cury);
+   if (engine->shadow) eraseshape (*board,shape,engine->curx_shadow,engine->cury_shadow);
+   if (allowed (*board,shape,engine->curx - 1,engine->cury))
 	 {
-		(*x)--;
-		result = TRUE;
+        engine->curx--;
+        result = TRUE;
+        if (engine->shadow)
+        {
+            engine->curx_shadow--;
+            place_shadow_to_bottom(*board,shape,engine->curx_shadow,&engine->cury_shadow,engine->cury);
+        }
 	 }
-   drawshape (board,shape,*x,y);
+   if (engine->shadow) drawshape (*board,shape,engine->curx_shadow,engine->cury_shadow);
+   drawshape (*board,shape,engine->curx,engine->cury);
    return result;
 }
 
 /* Move the shape right if possible */
-static bool shape_right (board_t board,shape_t *shape,int *x,int y)
+static bool shape_right (engine_t *engine)
 {
+   board_t *board = &engine->board;
+   shape_t *shape = &engine->shapes[engine->curshape];
    bool result = FALSE;
-   eraseshape (board,shape,*x,y);
-   if (allowed (board,shape,*x + 1,y))
+   eraseshape (*board,shape,engine->curx,engine->cury);
+   if (engine->shadow) eraseshape (*board,shape,engine->curx_shadow,engine->cury_shadow);
+   if (allowed (*board,shape,engine->curx + 1,engine->cury))
 	 {
-		(*x)++;
+		engine->curx++;
 		result = TRUE;
+		if (engine->shadow)
+		{
+            engine->curx_shadow++;
+            place_shadow_to_bottom(*board,shape,engine->curx_shadow,&engine->cury_shadow,engine->cury);
+		}
 	 }
-   drawshape (board,shape,*x,y);
+   if (engine->shadow) drawshape (*board,shape,engine->curx_shadow,engine->cury_shadow);
+   drawshape (*board,shape,engine->curx,engine->cury);
    return result;
 }
 
 /* Rotate the shape if possible */
-static bool shape_rotate (board_t board,shape_t *shape,int x,int y)
+static bool shape_rotate (engine_t *engine)
 {
+   board_t *board = &engine->board;
+   shape_t *shape = &engine->shapes[engine->curshape];
    bool result = FALSE;
    shape_t test;
-   eraseshape (board,shape,x,y);
+   eraseshape (*board,shape,engine->curx,engine->cury);
+   if (engine->shadow) eraseshape (*board,shape,engine->curx_shadow,engine->cury_shadow);
    memcpy (&test,shape,sizeof (shape_t));
    fake_rotate (&test);
-   if (allowed (board,&test,x,y))
+   if (allowed (*board,&test,engine->curx,engine->cury))
 	 {
 		memcpy (shape,&test,sizeof (shape_t));
 		result = TRUE;
+		if (engine->shadow) place_shadow_to_bottom(*board,shape,engine->curx_shadow,&engine->cury_shadow,engine->cury);
 	 }
-   drawshape (board,shape,x,y);
+   if (engine->shadow) drawshape (*board,shape,engine->curx_shadow,engine->cury_shadow);
+   drawshape (*board,shape,engine->curx,engine->cury);
    return result;
 }
 
 /* Move the shape one row down if possible */
-static bool shape_down (board_t board,shape_t *shape,int x,int *y)
+static bool shape_down (engine_t *engine)
 {
+   board_t *board = &engine->board;
+   shape_t *shape = &engine->shapes[engine->curshape];
    bool result = FALSE;
-   eraseshape (board,shape,x,*y);
-   if (allowed (board,shape,x,*y + 1))
+   eraseshape (*board,shape,engine->curx,engine->cury);
+   if (engine->shadow) eraseshape (*board,shape,engine->curx_shadow,engine->cury_shadow);
+   if (allowed (*board,shape,engine->curx,engine->cury + 1))
 	 {
-		(*y)++;
+		engine->cury++;
 		result = TRUE;
+		if (engine->shadow) place_shadow_to_bottom(*board,shape,engine->curx_shadow,&engine->cury_shadow,engine->cury);
 	 }
-   drawshape (board,shape,x,*y);
+   if (engine->shadow) drawshape (*board,shape,engine->curx_shadow,engine->cury_shadow);
+   drawshape (*board,shape,engine->curx,engine->cury);
    return result;
 }
 
 /* Check if shape can move down (= in the air) or not (= at the bottom */
 /* of the board or on top of one of the resting shapes) */
-static bool shape_bottom (board_t board,shape_t *shape,int x,int y)
+static bool shape_bottom (engine_t *engine)
 {
+   board_t *board = &engine->board;
+   shape_t *shape = &engine->shapes[engine->curshape];
    bool result = FALSE;
-   eraseshape (board,shape,x,y);
-   result = !allowed (board,shape,x,y + 1);
-   drawshape (board,shape,x,y);
+   eraseshape (*board,shape,engine->curx,engine->cury);
+   if (engine->shadow) eraseshape (*board,shape,engine->curx_shadow,engine->cury_shadow);
+   result = !allowed (*board,shape,engine->curx,engine->cury + 1);
+   if (engine->shadow) drawshape (*board,shape,engine->curx_shadow,engine->cury_shadow);
+   drawshape (*board,shape,engine->curx,engine->cury);
    return result;
 }
 
 /* Drop the shape until it comes to rest on the bottom of the board or */
 /* on top of a resting shape */
-static int shape_drop (board_t board,shape_t *shape,int x,int *y)
+static int shape_drop (engine_t *engine)
 {
+   board_t *board = &engine->board;
+   shape_t *shape = &engine->shapes[engine->curshape];
+   eraseshape (*board,shape,engine->curx,engine->cury);
    int droppedlines = 0;
-   eraseshape (board,shape,x,*y);
-   while (allowed (board,shape,x,*y + 1))
+
+   if (engine->shadow) {
+       drawshape (*board,shape,engine->curx_shadow,engine->cury_shadow);
+       droppedlines = engine->cury_shadow - engine->cury;
+       engine->cury = engine->cury_shadow;
+       return droppedlines;
+   }
+
+   while (allowed (*board,shape,engine->curx,engine->cury + 1))
 	 {
-		(*y)++;
+		engine->cury++;
 		droppedlines++;
 	 }
-   drawshape (board,shape,x,*y);
+   drawshape (*board,shape,engine->curx,engine->cury);
    return droppedlines;
 }
 
@@ -256,10 +304,13 @@ void shuffle (int *array, size_t n)
 void engine_init (engine_t *engine,void (*score_function)(engine_t *))
 {
    int i;
+   engine->shadow = FALSE;
    engine->score_function = score_function;
    /* intialize values */
    engine->curx = 5;
    engine->cury = 1;
+   engine->curx_shadow = 5;
+   engine->cury_shadow = 1;
    engine->bag_iterator = 0;
    /* create and randomize bag */
    for (int j = 0; j < NUMSHAPES; j++) engine->bag[j] = j;
@@ -286,19 +337,23 @@ void engine_move (engine_t *engine,action_t action)
 	 {
 		/* move shape to the left if possible */
 	  case ACTION_LEFT:
-		if (shape_left (engine->board,&engine->shapes[engine->curshape],&engine->curx,engine->cury)) engine->status.moves++;
+        if (shape_left (engine)) engine->status.moves++;
 		break;
 		/* rotate shape if possible */
 	  case ACTION_ROTATE:
-		if (shape_rotate (engine->board,&engine->shapes[engine->curshape],engine->curx,engine->cury)) engine->status.rotations++;
+		if (shape_rotate (engine)) engine->status.rotations++;
 		break;
 		/* move shape to the right if possible */
 	  case ACTION_RIGHT:
-		if (shape_right (engine->board,&engine->shapes[engine->curshape],&engine->curx,engine->cury)) engine->status.moves++;
+	    if (shape_right (engine)) engine->status.moves++;
+		break;
+		/* move shape to the down if possible */
+	  case ACTION_DOWN:
+		if (shape_down (engine)) engine->status.moves++;
 		break;
 		/* drop shape to the bottom */
 	  case ACTION_DROP:
-		engine->status.dropcount += shape_drop (engine->board,&engine->shapes[engine->curshape],engine->curx,&engine->cury);
+		engine->status.dropcount += shape_drop (engine);
 	 }
 }
 
@@ -312,7 +367,7 @@ void engine_move (engine_t *engine,action_t action)
  */
 int engine_evaluate (engine_t *engine)
 {
-   if (shape_bottom (engine->board,&engine->shapes[engine->curshape],engine->curx,engine->cury))
+   if (shape_bottom (engine))
 	 {
 		/* update status information */
 		int dropped_lines = droplines(engine->board);
@@ -322,6 +377,8 @@ int engine_evaluate (engine_t *engine)
 		engine->score_function (engine);
 		engine->curx -= 5;
 		engine->curx = abs (engine->curx);
+		engine->curx_shadow -= 5;
+		engine->curx_shadow = abs (engine->curx_shadow);
 		engine->status.rotations = 4 - engine->status.rotations;
 		engine->status.rotations = engine->status.rotations > 0 ? 0 : engine->status.rotations;
 		engine->status.efficiency += engine->status.dropcount + engine->status.rotations + (engine->curx - engine->status.moves);
@@ -330,6 +387,8 @@ int engine_evaluate (engine_t *engine)
 		/* intialize values */
 		engine->curx = 5;
 		engine->cury = 1;
+		engine->curx_shadow = 5;
+		engine->cury_shadow = 1;
 		engine->curshape = engine->bag[engine->bag_iterator%NUMSHAPES];
 		/* shuffle bag before first item in bag would be reused */
 		if ((engine->bag_iterator+1) % NUMSHAPES == 0) shuffle(engine->bag, NUMSHAPES);
@@ -340,7 +399,6 @@ int engine_evaluate (engine_t *engine)
 		/* return games status */
 		return allowed (engine->board,&engine->shapes[engine->curshape],engine->curx,engine->cury) ? 0 : -1;
 	 }
-   shape_down (engine->board,&engine->shapes[engine->curshape],engine->curx,&engine->cury);
+   shape_down (engine);
    return 1;
 }
-
