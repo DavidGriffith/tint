@@ -560,6 +560,32 @@ static void choose_level ()
    while (!str2int (&level,buf) || level < MINLEVEL || level > MAXLEVEL);
 }
 
+static bool evaluate (engine_t *engine)
+{
+    bool finished = FALSE;
+    switch (engine_evaluate (engine))
+    {
+        /* game over (board full) */
+        case -1:
+            if ((level < MAXLEVEL) && ((engine->status.droppedlines / 10) > level)) level++;
+            finished = TRUE;
+            break;
+            /* shape at bottom, next one released */
+        case 0:
+            if ((level < MAXLEVEL) && ((engine->status.droppedlines / 10) > level))
+            {
+                level++;
+                in_timeout (DELAY);
+            }
+            shapecount[engine->curshape]++;
+            break;
+            /* shape moved down one line */
+        case 1:
+            break;
+    }
+    return finished;
+}
+
           /***************************************************************************/
           /***************************************************************************/
           /***************************************************************************/
@@ -647,28 +673,7 @@ int main (int argc,char *argv[])
 			 in_flush ();
 		  }
 		else
-		  {
-			 switch (engine_evaluate (&engine))
-			   {
-				  /* game over (board full) */
-				case -1:
-				  if ((level < MAXLEVEL) && ((engine.status.droppedlines / 10) > level)) level++;
-				  finished = TRUE;
-				  break;
-				  /* shape at bottom, next one released */
-				case 0:
-				  if ((level < MAXLEVEL) && ((engine.status.droppedlines / 10) > level))
-					{
-					   level++;
-					   in_timeout (DELAY);
-					}
-				  shapecount[engine.curshape]++;
-				  break;
-				  /* shape moved down one line */
-				case 1:
-				  break;
-			   }
-		  }
+		  finished = evaluate(&engine);
 	 }
    while (!finished);
    /* Restore console settings and exit */
