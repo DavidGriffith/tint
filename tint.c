@@ -71,6 +71,7 @@
 
 static bool shownext;
 static bool dottedlines;
+static bool shadow;
 static int level = MINLEVEL - 1,shapecount[NUMSHAPES];
 static char blockchar = ' ';
 
@@ -505,6 +506,7 @@ static void showhelp ()
    fprintf (stderr,"  -n           Draw next shape\n");
    fprintf (stderr,"  -d           Draw vertical dotted lines\n");
    fprintf (stderr,"  -b <char>    Use this character to draw blocks instead of spaces\n");
+   fprintf (stderr,"  -s           Draw shadow of shape\n");
    exit (EXIT_FAILURE);
 }
 
@@ -538,6 +540,8 @@ static void parse_options (int argc,char *argv[])
 		    if (i >= argc || strlen(argv[i]) < 1) showhelp();
 		    blockchar = argv[i][0];
 		  }
+		else if (strcmp (argv[i],"-s") == 0)
+            shadow = TRUE;
 		else
 		  {
 			 fprintf (stderr,"Invalid option -- %s\n",argv[i]);
@@ -560,6 +564,32 @@ static void choose_level ()
    while (!str2int (&level,buf) || level < MINLEVEL || level > MAXLEVEL);
 }
 
+static bool evaluate (engine_t *engine)
+{
+    bool finished = FALSE;
+    switch (engine_evaluate (engine))
+    {
+        /* game over (board full) */
+        case -1:
+            if ((level < MAXLEVEL) && ((engine->status.droppedlines / 10) > level)) level++;
+            finished = TRUE;
+            break;
+            /* shape at bottom, next one released */
+        case 0:
+            if ((level < MAXLEVEL) && ((engine->status.droppedlines / 10) > level))
+            {
+                level++;
+                in_timeout (DELAY);
+            }
+            shapecount[engine->curshape]++;
+            break;
+            /* shape moved down one line */
+        case 1:
+            break;
+    }
+    return finished;
+}
+
           /***************************************************************************/
           /***************************************************************************/
           /***************************************************************************/
@@ -572,10 +602,11 @@ int main (int argc,char *argv[])
    /* Initialize */
    rand_init ();							/* must be called before engine_init () */
    engine_init (&engine,score_function);	/* must be called before using engine.curshape */
-   finished = shownext = FALSE;
+   finished = shownext = shadow = FALSE;
    memset (shapecount,0,NUMSHAPES * sizeof (int));
    shapecount[engine.curshape]++;
    parse_options (argc,argv);				/* must be called after initializing variables */
+   engine.shadow = shadow;
    if (level < MINLEVEL) choose_level ();
    io_init ();
    drawbackground ();
@@ -597,6 +628,7 @@ int main (int argc,char *argv[])
 				  engine_move (&engine,ACTION_LEFT);
 				  break;
 				case 'k':
+				case KEY_UP:
 				case '\n':
 				  engine_move (&engine,ACTION_ROTATE);
 				  break;
@@ -604,9 +636,12 @@ int main (int argc,char *argv[])
 				case KEY_RIGHT:
 				  engine_move (&engine,ACTION_RIGHT);
 				  break;
-				case ' ':
 				case KEY_DOWN:
+				  engine_move (&engine,ACTION_DOWN);
+				  break;
+				case ' ':
 				  engine_move (&engine,ACTION_DROP);
+				  finished = evaluate(&engine);          /* prevent key press after drop */
 				  break;
 				  /* show next piece */
 				case 's':
@@ -618,7 +653,6 @@ int main (int argc,char *argv[])
 				  break;
 				  /* next level */
 				case 'a':
-				case KEY_UP:
 				  if (level < MAXLEVEL)
 					{
 					   level++;
@@ -647,28 +681,7 @@ int main (int argc,char *argv[])
 			 in_flush ();
 		  }
 		else
-		  {
-			 switch (engine_evaluate (&engine))
-			   {
-				  /* game over (board full) */
-				case -1:
-				  if ((level < MAXLEVEL) && ((engine.status.droppedlines / 10) > level)) level++;
-				  finished = TRUE;
-				  break;
-				  /* shape at bottom, next one released */
-				case 0:
-				  if ((level < MAXLEVEL) && ((engine.status.droppedlines / 10) > level))
-					{
-					   level++;
-					   in_timeout (DELAY);
-					}
-				  shapecount[engine.curshape]++;
-				  break;
-				  /* shape moved down one line */
-				case 1:
-				  break;
-			   }
-		  }
+		  finished = evaluate(&engine);
 	 }
    while (!finished);
    /* Restore console settings and exit */

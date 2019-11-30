@@ -79,7 +79,8 @@ typedef struct
 
 typedef struct engine_struct
 {
-   int curx,cury;									/* coordinates of current piece */
+   bool shadow;                                     /* show shadow */
+   int curx,cury,curx_shadow,cury_shadow;			/* coordinates of current piece */
    int curshape,nextshape;							/* current & next shapes */
    int score;										/* score */
    int bag_iterator;								/* iterator for randomized bag */
@@ -90,7 +91,7 @@ typedef struct engine_struct
    void (*score_function)(struct engine_struct *);	/* score function */
 } engine_t;
 
-typedef enum { ACTION_LEFT, ACTION_ROTATE, ACTION_RIGHT, ACTION_DROP } action_t;
+typedef enum { ACTION_LEFT, ACTION_ROTATE, ACTION_RIGHT, ACTION_DROP, ACTION_DOWN } action_t;
 
 /*
  * Global variables
