@@ -79,7 +79,7 @@ static void real_rotate (shape_t *shape,bool clockwise)
 }
 
 /* Rotate shapes the way tetris likes it (= not mathematically correct) */
-static void fake_rotate (shape_t *shape)
+static void fake_rotate (shape_t *shape,bool clockwise)
 {
    switch (shape->type)
 	 {
@@ -92,10 +92,10 @@ static void fake_rotate (shape_t *shape)
 		if (shape->flipped) real_rotate (shape,FALSE); else real_rotate (shape,TRUE);
 		shape->flipped = !shape->flipped;
 		break;
-	  case 2:	/* Rotate these three anti-clockwise */
+	  case 2:	/* Rotate these three according to supplied direction */
 	  case 4:
 	  case 5:
-		real_rotate (shape,FALSE);
+		real_rotate (shape,clockwise);
 		break;
 	  case 3:	/* This one is not rotated at all */
 		break;
@@ -177,7 +177,7 @@ static bool shape_right (engine_t *engine)
 }
 
 /* Rotate the shape if possible */
-static bool shape_rotate (engine_t *engine)
+static bool shape_rotate (engine_t *engine,bool clockwise)
 {
    board_t *board = &engine->board;
    shape_t *shape = &engine->shapes[engine->curshape];
@@ -186,7 +186,7 @@ static bool shape_rotate (engine_t *engine)
    eraseshape (*board,shape,engine->curx,engine->cury);
    if (engine->shadow) eraseshape (*board,shape,engine->curx_shadow,engine->cury_shadow);
    memcpy (&test,shape,sizeof (shape_t));
-   fake_rotate (&test);
+   fake_rotate (&test,clockwise);
    if (allowed (*board,&test,engine->curx,engine->cury))
 	 {
 		memcpy (shape,&test,sizeof (shape_t));
@@ -339,9 +339,13 @@ void engine_move (engine_t *engine,action_t action)
 	  case ACTION_LEFT:
         if (shape_left (engine)) engine->status.moves++;
 		break;
-		/* rotate shape if possible */
-	  case ACTION_ROTATE:
-		if (shape_rotate (engine)) engine->status.rotations++;
+		/* rotate shape clockwise if possible */
+	  case ACTION_ROTATE_CLOCKWISE:
+		if (shape_rotate (engine, true)) engine->status.rotations++;
+		break;
+		/* rotate shape counterclockwise if possible */
+	  case ACTION_ROTATE_COUNTERCLOCKWISE:
+		if (shape_rotate (engine, false)) engine->status.rotations++;
 		break;
 		/* move shape to the right if possible */
 	  case ACTION_RIGHT:

@@ -91,7 +91,7 @@ typedef struct engine_struct
    void (*score_function)(struct engine_struct *);	/* score function */
 } engine_t;
 
-typedef enum { ACTION_LEFT, ACTION_ROTATE, ACTION_RIGHT, ACTION_DROP, ACTION_DOWN } action_t;
+typedef enum { ACTION_LEFT, ACTION_ROTATE_CLOCKWISE, ACTION_ROTATE_COUNTERCLOCKWISE, ACTION_RIGHT, ACTION_DROP, ACTION_DOWN } action_t;
 
 /*
  * Global variables

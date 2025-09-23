@@ -630,7 +630,10 @@ int main (int argc,char *argv[])
 				case 'k':
 				case KEY_UP:
 				case '\n':
-				  engine_move (&engine,ACTION_ROTATE);
+				  engine_move (&engine,ACTION_ROTATE_COUNTERCLOCKWISE);
+				  break;
+				case 'K':
+				  engine_move (&engine,ACTION_ROTATE_CLOCKWISE);
 				  break;
 				case 'l':
 				case KEY_RIGHT:
