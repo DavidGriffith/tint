@@ -142,7 +142,7 @@ void out_printf (char *format, ...)
 {
    va_list ap;
    va_start (ap,format);
-   vwprintw (stdscr,format,ap);
+   vw_printw (stdscr,format,ap);
    va_end (ap);
 }
 
